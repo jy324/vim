@@ -1,10 +1,18 @@
 # vim
 
-个人 Vim 配置，不一定适合每个人，选择你需要的整合到自己配置中：
+个人 Vim 配置，适配 Vim 8.0+ 与 Neovim，支持终端与 GUI。配置采用模块化设计，可按需选择功能组合。
 
-配置入口是 init.vim，主要配置集中在 init 目录下面。
+**核心特性：**
+- 🎯 **任务系统**：AsyncRun/AsyncTasks 提供完整的编译/运行/测试工作流
+- 📂 **文件导航**：Dirvish/LeaderF/CtrlP + QuickUI 菜单实现高效浏览
+- 🔧 **多语言支持**：内置 C/C++/Python/Go/Lua/Markdown 等数十种语言增强
+- 🎨 **UI 增强**：QuickMenu 双层菜单 + 丰富配色方案 + 状态栏定制
+- 🚀 **可选 LSP**：支持 CoC/vim-lsp/LanguageClient 等多种补全方案
+- 📝 **开发工具**：集成 Git/SVN、Lint、调试器、翻译、文档查询等
 
-(本文档严重滞后于功能，懒得更新了)
+配置入口是 `init.vim`，主要配置集中在 `init/` 目录，插件管理使用 `bundle.vim`。
+
+> 💡 **提示**：详细功能说明见 [doc/features-shortcuts.md](doc/features-shortcuts.md)
 
 
 ## Install
@@ -51,18 +59,47 @@ so d:/github/vim/init.vim
 so d:/github/vim/skywind.vim
 ```
 
-### 包管理：
+### 包管理
 
-在你的 `.vimrc` 文件中加入相关包配置：
+使用 [vim-plug](https://github.com/junegunn/vim-plug) 管理插件。在 `.vimrc` 中通过 `g:bundle_group` 控制加载哪些插件组：
 
 ```VimL
-let g:bundle_group = ['simple', 'basic', 'inter', 'opt', 'ale', 'echodoc']
+" 基础配置（必选）
+let g:bundle_group = ['simple', 'basic']
+
+" 添加更多功能（可选）
+let g:bundle_group += ['inter', 'high', 'opt']
+
+" 启用 LSP/补全（三选一）
+" let g:bundle_group += ['coc']        " coc.nvim
+" let g:bundle_group += ['lsp']       " vim-lsp
+" let g:bundle_group += ['yegappan']  " yegappan/lsp (Vim 9.0+)
+
+" 其他可选模块
+" let g:bundle_group += ['ale', 'echodoc', 'lightline', 'airline']
+" let g:bundle_group += ['vimwiki', 'floaterm', 'nerdtree', 'copilot']
+" let g:bundle_group += ['colors', 'vim-go', 'vimspector']
+
 so ~/.vim/vim/bundle.vim
 ```
 
-Windows 下修改对应目录。
+**可用插件组：**
+- `simple`：Sneak、Surround、Tabular、Dirvish 等基础增强
+- `basic`：LeaderF/CtrlP、ChooseWin、语法高亮、文本对象
+- `inter`：Notes、Outliner、Gist、DrawIt、Flog、vim-mark
+- `high`：Signify、FZF、Ranger、Table-mode、Autoformat
+- `opt`：CtrlSF、Translator、Gutentags、Switch、Emmet、Vimux
 
-本配置依个人习惯，将 tabsize shiftwidth 等设置成了 4个字节宽度，并且关闭了 expandtab，不喜欢的话可以在 source 了两个文件以后覆盖该设置。
+**编辑器选项：**
+本配置默认 `tabstop=4`、`shiftwidth=4`、`noexpandtab`。如需修改，在 source 后覆盖：
+
+```VimL
+so ~/.vim/vim/init.vim
+so ~/.vim/vim/skywind.vim
+
+set expandtab      " 使用空格代替 Tab
+set tabstop=2      " 修改缩进宽度
+```
 
 
 ## 主目录
@@ -124,12 +161,14 @@ ESC 离开目录，按对应字母触发功能，CTRL+j/k 翻页，BackSpace 可
 
 | 按键    | 说 明    |
 | :-----: | ------   | 
-| TAB h | 同 CTRL-W h |
-| TAB j | 同 CTRL-W j |
-| TAB k | 同 CTRL-W k |
-| TAB l | 同 CTRL-W l |
+| TAB h/j/k/l | 同 CTRL-W h/j/k/l，快速切换窗口 |
+| Alt-H/J/K/L | Normal/Insert/Terminal 模式跨窗口跳转 |
+| Alt-e | ChooseWin 模式选择窗口 |
+| <Space>= / - | 增大/减小当前窗口高度 |
+| <Space>, / . | 减小/增大当前窗口宽度 |
+| TAB g | 回到上一个窗口 (`<C-W>p`) |
 
-先按 TAB键，再按 HJKL 其中一个来跳转窗口。
+**提示**：`Alt-H/J/K/L` 在终端模式下也可用，无需退出 Terminal。
 
 
 ### TabPage 
@@ -189,8 +228,156 @@ ESC 离开目录，按对应字母触发功能，CTRL+j/k 翻页，BackSpace 可
 
 使用 `+` 返回当前文件所在目录时，如果文件被修改过未保存，且 Vim 没有设置 hidden，则会在该文件窗口上面打开目录浏览，不会把文件关掉。 
 
-当文件浏览器打开以后，按 `~` 键，返回用户目录（$HOME）；按 `反引号`（1左边那个键），返回项目根目录，详细见：[Vinegar](https://github.com/skywind3000/vim/wiki/Vim-Vinegar-and-Oil)。
+当文件浏览器打开以后，按 `~` 键，返回用户目录（$HOME）；按 `` ` `` （反引号），返回项目根目录。详见：[Vinegar](https://github.com/skywind3000/vim/wiki/Vim-Vinegar-and-Oil)
 
+## 更多功能
+
+### 代码导航与搜索
+
+| 快捷键 | 功能说明 |
+|:------:|----------|
+| `Ctrl-P` / `Ctrl-N` | LeaderF 模糊搜索文件 / MRU 文件 |
+| `Alt-P` / `Alt-N` | LeaderF 搜索函数 / Buffer |
+| `Alt-I` / `Alt-Y` | 显示当前文件函数列表 |
+| `<Leader>cv/cx` | GrepCode 全项目搜索当前单词 |
+| `<Leader>cs/cg/cc` | Cscope 查找符号/定义/调用者 |
+| `Alt-;` | 预览当前光标下的 Tag |
+| `gz` / `gZ` | Sneak 正向/反向快速跳转 |
+
+### Lint 与代码检查
+
+| 快捷键 | 功能说明 |
+|:------:|----------|
+| `<Space>lp` | 运行 pylint (Python) |
+| `<Space>lf` | 运行 flake8 (Python) |
+| `<Space>ls` | 运行 splint (C) |
+| `<Space>lc` | 运行 cppcheck (C/C++) |
+| `<Space>lt` | HTML 格式化 |
+| `[e` / `]e` | 跳转到上/下一个错误 |
+
+### 版本控制（Git/SVN）
+
+| 快捷键 | 功能说明 |
+|:------:|----------|
+| 主目录 → SVN/GIT | 查看 diff/log/blame 等操作 |
+| `<Space>sc/su/st` | SVN commit/update/status |
+| `:Ghistory` | 查看当前文件 Git 历史 |
+| `:Gpush` / `:Gfetch` | 异步 Git push/fetch |
+
+### 快速编辑
+
+| 快捷键 | 功能说明 |
+|:------:|----------|
+| `<Space>e-/e=/e#` | 插入不同风格的注释框 |
+| `<Space>ec` | 插入文件头版权信息 |
+| `<Space>em` | 插入 main 函数模板 |
+| `<Space>et` | 插入当前时间戳 |
+| `<Space>at` | 对齐 Cheat Sheet 格式 |
+| `gb=` / `gb,` / `gbl` | Tabular 对齐赋值/逗号/竖线 |
+| `<Space>p` | 用寄存器 0 粘贴（不覆盖剪贴板） |
+
+### 配置快速访问
+
+| 快捷键 | 打开文件 |
+|:------:|----------|
+| `<Space>hp` | `~/.vim/project.txt` |
+| `<Space>hk` | `init/keymaps.vim` |
+| `<Space>hv` | `bundle.vim` |
+| `<Space>hs` | `skywind.vim` |
+| `<Space>ht` | `tasks.ini` |
+| `<Space>hr` | `.vimrc` / `init.vim` |
+| `<Space>hq` | `quicknote.txt` 快速笔记 |
+
+## 配置自定义
+
+### 本地配置文件
+
+配置会自动加载本地覆盖文件（不纳入版本控制）：
+
+- Vim: `~/.vim/local.vim`
+- Neovim: `~/.config/nvim/local.vim`
+
+可在此文件中覆盖任何默认设置、添加私有快捷键或加载额外插件。
+
+### 备份文件说明
+
+默认启用文件备份功能，所有 `.bak` 文件保存在 `~/.vim/tmp/`：
+
+```vim
+set backup
+set writebackup
+set backupdir=~/.vim/tmp
+set backupext=.bak
+set noswapfile
+set noundofile
+```
+
+**禁用备份**：在加载配置前设置 `let g:asc_no_backup = 1`
+
+### 任务系统自定义
+
+在项目根目录创建 `.tasks` 文件定义项目特定任务：
+
+```ini
+[project-build]
+command=make -j8
+cwd=<root>
+
+[project-run]
+command=./build/myapp
+output=terminal
+```
+
+按 `<S-F12>` 快速编辑任务配置，`<F12>` 选择并运行任务。
+
+## 插件列表摘要
+
+**核心插件**（启用 `simple` + `basic`）：
+- vim-plug, vim-dirvish, vim-sneak, vim-surround, vim-unimpaired
+- easymotion/stargate, tabular, delimitMate/auto-pairs
+- LeaderF/CtrlP, vim-choosewin, vim-expand-region, vim-dict
+- vim-textobj-*, python-syntax, vim-markdown 等
+
+**高级功能**（`inter` + `high` + `opt`）：
+- signify, fzf, ranger, gutentags, ctrlsf, translator
+- neoformat, vim-table-mode, gist-vim, vim-notes, flog
+
+**可选模块**：
+- **LSP/补全**: coc.nvim, vim-lsp, yegappan-lsp, neocomplete
+- **调试**: vimspector, NeoDebug, termdebug
+- **Git**: vim-fugitive, gv.vim, vim-flog, vimagit
+- **UI**: lightline/airline, nerdtree, defx, floaterm, vim-which-key
+- **语言**: vim-go, vim-lsp-settings, copilot.vim, tabnine-vim
+- **其他**: vimwiki, calendar, grammarous, pangu.vim
+
+完整列表见 [bundle.vim](bundle.vim)，每个插件的详细配置在 `site/bundle/*.vim`。
+
+## 常见问题
+
+**Q: 如何更新插件？**
+```vim
+:PlugUpdate
+```
+
+**Q: 如何禁用某个快捷键？**  
+在 `local.vim` 中 `unmap` 或重新映射：
+```vim
+unmap <Space>lp
+nnoremap <Space>lp :echo "Disabled"<CR>
+```
+
+**Q: 终端下 Alt 键不工作？**  
+确保终端发送 ESC 序列。部分终端需配置 Meta key 或使用 `<M-xxx>` 的 ESC 等价形式。
+
+**Q: 如何适配 Neovim？**  
+大部分配置兼容，LSP 推荐用 nvim-lspconfig。Lua 配置可放在 `neovim.lua`。
+
+## 相关资源
+
+- **文档**: [doc/features-shortcuts.md](doc/features-shortcuts.md) - 详细功能与快捷键
+- **Wiki**: [GitHub Wiki](https://github.com/skywind3000/vim/wiki)
+- **AsyncTasks**: [vim-tasks](https://github.com/skywind3000/asynctasks.vim)
+- **QuickUI**: [vim-quickui](https://github.com/skywind3000/vim-quickui)
 
 ### Credit
 
